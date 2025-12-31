@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      SafeUM Accounts Generator
+    </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+      :root { 
+            --bg: #080a0f; --panel: rgba(17, 25, 40, 0.75); 
+            --emerald: #00ff88; --glow: rgba(0, 255, 136, 0.4);
+            --border: rgba(255, 255, 255, 0.125); --text: #f0f0f0; 
+        }
+        * { box-sizing: border-box; font-family: &#39;Segoe UI&#39;, sans-serif; }
+        body { 
+            margin: 0; background: var(--bg); color: var(--text); 
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* SHINING GREEN TECH ORB */
+        .orb {
+            position: absolute;
+            width: 550px;
+            height: 550px;
+            /* Using different shades of tech-green for a &#34;liquid&#34; look */
+            background: radial-gradient(circle, 
+                rgba(0, 255, 136, 0.4) 0%, 
+                rgba(0, 128, 70, 0.2) 40%, 
+                transparent 75%
+            );
+            filter: blur(60px);
+            border-radius: 50%;
+            z-index: -1;
+            /* Centering it perfectly */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* The &#34;Shine&#34; Animation */
+            animation: orbPulse 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes orbPulse {
+            0% {
+                opacity: 0.3;
+                transform: translate(-50%, -50%) scale(0.9);
+                filter: blur(60px) brightness(1);
+            }
+            100% {
+                opacity: 0.6;
+                transform: translate(-50%, -50%) scale(1.1);
+                filter: blur(40px) brightness(1.8); /* This creates the &#34;shining&#34; burst */
+            }
+        }
+
+        /* SHINING CONTAINER EDGES */
+        .main-card { 
+            width: 95%; max-width: 480px; background: var(--panel); 
+            border: 1px solid var(--border); border-radius: 20px; padding: 35px; 
+            backdrop-filter: blur(16px); position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5), 0 0 15px var(--glow);
+            border: 1px solid var(--emerald);
+        }
+
+        header { text-align: center; margin-bottom: 25px; }
+        header h1 { margin: 0; font-size: 26px; color: #fff; text-shadow: 0 0 10px var(--emerald); }
+        .copyright { font-size: 11px; color: #8b949e; margin-top: 5px; }
+
+        .input-field { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: rgba(0,0,0,0.4); padding: 12px 18px; border-radius: 10px; 
+            border: 1px solid var(--border); margin-bottom: 12px;
+        }
+        .input-field input { background: transparent; border: none; color: var(--emerald); width: 80px; text-align: right; font-weight: bold; outline: none; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+        .stat-box { 
+            background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; 
+            border: 1px solid var(--border); text-align: center;
+        }
+        .stat-box .val { font-size: 20px; font-weight: bold; display: block; }
+
+        .status-bar { text-align: center; font-size: 12px; color: #8b949e; margin-bottom: 20px; }
+        .status-bar span { color: var(--emerald); font-weight: bold; }
+
+        .btn { 
+            width: 100%; padding: 14px; border-radius: 10px; border: none; 
+            font-weight: 600; cursor: pointer; transition: 0.3s; margin-bottom: 10px;
+        }
+        .btn-start { background: var(--emerald); color: #000; }
+        .btn-start:hover { box-shadow: 0 0 20px var(--emerald); transform: translateY(-2px); }
+        .btn-stop { background: #ff4d4d; color: #fff; display: none; }
+        .btn-sec { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; }
+        .btn-sec:hover { border-color: var(--emerald); }
+
+        .social-footer { display: flex; justify-content: center; gap: 30px; margin-top: 20px; }
+        .social-footer a { color: #8b949e; font-size: 22px; transition: 0.3s; }
+        .social-footer a:hover { color: var(--emerald); transform: scale(1.2); }
+
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; }
+        .modal { background: #161b22; width: 90%; max-width: 450px; border-radius: 15px; padding: 25px; border: 1px solid var(--emerald); }
+        #results-box { height: 200px; background: #000; border-radius: 8px; padding: 15px; overflow-y: auto; color: var(--emerald); font-family: monospace; font-size: 12px; white-space: pre-wrap; margin-bottom: 15px; }
+    </style>
+  </head>
+  <body>
+    <div class="orb">
+    </div>
+    <div class="main-card">
+      <header>
+        <h1>
+          SafeUM Accounts Generator
+        </h1>
+        <div class="copyright">
+          © Avel&#39;s Android
+        </div>
+      </header>
+      <div class="input-group">
+        <div class="input-field">
+          <label>
+            Username Length
+          </label>
+          <input type="number" id="len" value="12" />
+        </div>
+        <div class="input-field">
+          <label>
+            Concurrency Value
+          </label>
+          <input type="number" id="threads" value="1000" />
+        </div>
+        <div class="input-field">
+          <label>
+            Target Accounts
+          </label>
+          <input type="number" id="target" value="100" />
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <span class="val" id="fc" style="color:#ff4d4d">          0
+</span>
+          <span class="lbl" style="font-size:10px">          FAILED
+</span>
+        </div>
+        <div class="stat-box">
+          <span class="val" id="sc" style="color:var(--emerald)">          0
+</span>
+          <span class="lbl" style="font-size:10px">          SUCCESS
+</span>
+        </div>
+        <div class="stat-box">
+          <span class="val" id="rc" style="color:#ffbb00">          0
+</span>
+          <span class="lbl" style="font-size:10px">          RETRY
+</span>
+        </div>
+      </div>
+      <div class="status-bar">
+        Status:
+        <span id="status-text">        Idle
+</span>
+      </div>
+      <div class="btn-stack">
+        <button id="startBtn" class="btn btn-start" onclick="handleStart(true)">
+          Start Generation
+        </button>
+        <button id="stopBtn" class="btn btn-stop" onclick="handleStart(false)">
+          Stop Generation
+        </button>
+        <button class="btn btn-sec" onclick="toggleModal(true)">
+          Preview Accounts
+        </button>
+        <a href="/api/download" class="btn btn-sec" style="display:block; text-decoration:none; text-align:center">        Download Accounts
+</a>
+      </div>
+      <div class="social-footer">
+        <a href="https://t.me/AvelsAndroid" target="_blank">        <i class="fab fa-telegram"></i>
+</a>
+        <a href="https://youtube.com/@AvelsAndroid" target="_blank">        <i class="fab fa-youtube"></i>
+</a>
+        <a href="https://whatsapp.com/channel/0029Vaw9oQp9cDDaQRo6kl0P" target="_blank">        <i class="fab fa-whatsapp"></i>
+</a>
+      </div>
+    </div>
+    <div class="overlay" id="previewModal">
+      <div class="modal">
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px">
+          <h2 style="margin:0; font-size:18px">
+            Generated Accounts
+          </h2>
+          <button onclick="toggleModal(false)" style="background:none; border:none; color:#fff; cursor:pointer; font-size:20px">
+            ×
+          </button>
+        </div>
+        <div id="results-box">
+        </div>
+        <button class="btn btn-start" onclick="copyToClipboard()">
+          Copy to Clipboard
+        </button>
+      </div>
+    </div>
+    <script>
+      let isRunning = false, accounts = [];
+        async function handleStart(start) {
+            const body = { length: document.getElementById(&#39;len&#39;).value, threads: document.getElementById(&#39;threads&#39;).value, target: document.getElementById(&#39;target&#39;).value };
+            await fetch(start ? &#39;/api/start&#39; : &#39;/api/stop&#39;, { method: start ? &#39;POST&#39; : &#39;GET&#39;, headers: {&#39;Content-Type&#39;: &#39;application/json&#39;}, body: start ? JSON.stringify(body) : null });
+            document.getElementById(&#39;startBtn&#39;).style.display = start ? &#39;none&#39; : &#39;block&#39;;
+            document.getElementById(&#39;stopBtn&#39;).style.display = start ? &#39;block&#39; : &#39;none&#39;;
+            document.getElementById(&#39;status-text&#39;).innerText = start ? &#39;Running&#39; : &#39;Idle&#39;;
+            isRunning = start;
+        }
+        setInterval(async () =&gt; {
+            if(!isRunning) return;
+            const res = await fetch(&#39;/api/status&#39;); const data = await res.json();
+            document.getElementById(&#39;sc&#39;).innerText = data.success; 
+            document.getElementById(&#39;fc&#39;).innerText = data.failed; 
+            document.getElementById(&#39;rc&#39;).innerText = data.retry;
+            accounts = data.accounts;
+        }, 1000);
+        function toggleModal(show) { 
+            const box = document.getElementById(&#39;results-box&#39;);
+            document.getElementById(&#39;previewModal&#39;).style.display = show ? &#39;flex&#39; : &#39;none&#39;; 
+            if (show) {
+                if (accounts.length === 0) {
+                    box.innerText = &#34;Empty List&#34;;
+                    box.style.textAlign = &#34;center&#34;;
+                    box.style.color = &#34;#8b949e&#34;;
+                } else {
+                    box.innerText = accounts.join(&#39;\n&#39;);
+                    box.style.textAlign = &#34;left&#34;;
+                    box.style.color = &#34;var(--emerald)&#34;;
+                }
+            }
+        }
+        function copyToClipboard() { navigator.clipboard.writeText(accounts.join(&#39;\n&#39;)); 
+         }
+    </script>
+    <script src="https://replit-cdn.com/replit-pill/replit-pill.global.js" data-referral-code="ru33eoru3rk8" data-repl-id="21a8f491-64d6-467b-85bb-acad70dfa79b">
+    </script>
+  </body>
+</html>
